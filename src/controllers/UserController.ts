@@ -1,11 +1,9 @@
 import User from "../models/User";
 import { NodeMailer } from "../utils/NodeMailer";
 import { Utils } from "../utils/Utils";
-import { Jwt } from './../utils/Jwt';
-
+import { Jwt } from "./../utils/Jwt";
 
 export class UserController {
-
   static async signup(req, res, next) {
     console.log("req: ", req);
     const name = req.body.name;
@@ -15,7 +13,6 @@ export class UserController {
     const type = req.body.type;
     const status = req.body.status;
     const verification_token = Utils.generateVerificationToken();
-
 
     try {
       const hash = await Utils.encryptPassword(password);
@@ -38,7 +35,7 @@ export class UserController {
       const token = Jwt.jwtSign(payload);
       res.json({
         token: token,
-        user: user
+        user: user,
       });
       await NodeMailer.sendMail({
         to: [user.email],
@@ -49,6 +46,7 @@ export class UserController {
       next(e);
     }
   }
+  
   static async verifyUserEmailToken(req, res, next) {
     const verification_token = req.body.email;
     const email = req.body.email;
@@ -61,7 +59,7 @@ export class UserController {
         },
         {
           email_varified: true,
-          updated_at: new Date()
+          updated_at: new Date(),
         },
         {
           new: true,
@@ -79,7 +77,6 @@ export class UserController {
     }
   }
 
-
   static async resendVerificationEmail(req, res, next) {
     res.send(req.decoded);
     const verification_token = Utils.generateVerificationToken();
@@ -94,7 +91,6 @@ export class UserController {
         }
       );
       if (user) {
-
         res.json({ success: true });
         await NodeMailer.sendMail({
           to: [user.email],
@@ -108,12 +104,13 @@ export class UserController {
       next(e);
     }
   }
+
   static async login(req, res, next) {
     const user = req.user;
     const password = req.query.password;
     const data = {
       password,
-      encrypt_password: user.password
+      encrypt_password: user.password,
     };
     try {
       await Utils.comparePassword(data);
@@ -124,12 +121,13 @@ export class UserController {
       const token = Jwt.jwtSign(payload);
       res.json({
         token: token,
-        user: user
+        user: user,
       });
     } catch (e) {
       next(e);
     }
   }
+
   static async sendResetPasswordOtp(req, res, next) {
     const email = req.query.email;
     const reset_password_token = Utils.generateVerificationToken();
@@ -149,7 +147,7 @@ export class UserController {
           to: [user.email],
           subject: "Resend password email Verification OTP",
           html: `<h1>Your otp is ${reset_password_token}</h1>`,
-        })
+        });
       } else {
         throw new Error("User doesn't exist");
       }
@@ -159,7 +157,6 @@ export class UserController {
   }
 
   static async verifyResetPasswordToken(req, res, next) {
-
     res.json({ success: true });
 
     // }catch(e) {
@@ -176,14 +173,14 @@ export class UserController {
         user._id,
         {
           updated_at: new Date(),
-          password: encryptedPassword
+          password: encryptedPassword,
         },
         { new: true }
       );
       if (updatedUser) {
         res.send(updatedUser);
       } else {
-        throw new Error('User doesn\'t exist');
+        throw new Error("User doesn't exist");
       }
     } catch (e) {
       next(e);
@@ -197,13 +194,12 @@ export class UserController {
       if (profile) {
         res.send(profile);
       } else {
-        throw new Error('User doesn\'t exist');
+        throw new Error("User doesn't exist");
       }
     } catch (e) {
       next(e);
     }
   }
-
 
   static async updatePhoneNumber(req, res, next) {
     const user = req.user;
@@ -220,7 +216,6 @@ export class UserController {
     }
   }
 
-
   static async updateUserProfile(req, res, next) {
     const user = req.user;
     const phone = req.body.phone;
@@ -229,10 +224,10 @@ export class UserController {
     const verification_token = Utils.generateVerificationToken();
     try {
       const userData = await User.findById(user.aud);
-      if (!userData) throw new Error('User doesn\'t exist');
+      if (!userData) throw new Error("User doesn't exist");
       await Utils.comparePassword({
         password: plain_password,
-        encrypt_password: userData.password
+        encrypt_password: userData.password,
       });
       const updatedUser = await User.findByIdAndUpdate(
         user.aud,
@@ -242,27 +237,27 @@ export class UserController {
           email_verified: false,
           verification_token,
           verification_token_time: Date.now() + new Utils().MAX_TOKEN_TIME,
-          updated_at: new Date()
+          updated_at: new Date(),
         },
         { new: true }
       );
       const payload = {
         aud: user.aud,
-        email: updatedUser.email
+        email: updatedUser.email,
       };
       const token = Jwt.jwtSign(payload);
       res.json({
         token: token,
-        user: updatedUser
+        user: updatedUser,
       });
       // send email to user for updated email verification
       await NodeMailer.sendMail({
         to: [updatedUser.email],
-        subject: 'Email Verification',
-        html: `<h1>Your Otp is ${verification_token}</h1>`
+        subject: "Email Verification",
+        html: `<h1>Your Otp is ${verification_token}</h1>`,
       });
     } catch (e) {
       next(e);
     }
   }
-}       
+}
