@@ -1,6 +1,25 @@
 import * as Bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
 import * as jwt from "jsonwebtoken";
+import * as Multer from 'multer';
+
+const desinationOptions = Multer.diskStorage({
+  destination: (req, file, cd) => {
+    cd(null, './src/uploads/restaurants');
+  },
+  filename: (req,file, cd) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cd(null,  uniqueSuffix + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cd) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cd(null , true);
+  } else {
+    cd(null, false);
+ }
+};
 
 export class Utils {
   static jwtSign(payload: { user_id: any; email: any; }) {
@@ -14,6 +33,8 @@ export class Utils {
   }
 
   public MAX_TOKEN_TIME = 5 * 60 * 1000;
+  public multer = Multer ({storage: desinationOptions, fileFilter: fileFilter});
+
 
   static generateVerificationToken(digit: number = 6) {
     const digits = "0123456789";
