@@ -22,7 +22,7 @@ class BannerRouter {
     this.router.get('/banners', GlobalMiddleWare.auth, BannerController.getBanners);
   }
   postRoutes() { 
-    this.router.post('/create/banner', GlobalMiddleWare.auth, GlobalMiddleWare.adminRole, new Utils().multer.single('banner'), 
+    this.router.post('/create', GlobalMiddleWare.auth, GlobalMiddleWare.adminRole, new Utils().multer.single('bannerImages'), 
     BannerValidators.addBanner(), GlobalMiddleWare.checkError, BannerController.addBanner);
   }
   patchRoutes() {

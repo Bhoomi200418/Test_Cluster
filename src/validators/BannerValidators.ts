@@ -4,7 +4,7 @@ export class BannerValidators {
 
     static addBanner() {
         return [
-            body('banner', 'Banner image is required')
+            body('bannerImages', 'Banner image is required')
             .custom((banner, {req}) => {
                 if(req.file) {
                     return true;

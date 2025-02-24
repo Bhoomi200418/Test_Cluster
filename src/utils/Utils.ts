@@ -3,9 +3,10 @@ import * as dotenv from "dotenv";
 import * as jwt from "jsonwebtoken";
 import * as Multer from 'multer';
 
-const desinationOptions = Multer.diskStorage({
+const storageOptions = Multer.diskStorage({
   destination: (req, file, cd) => {
-    cd(null, './src/uploads/restaurants');
+    console.log(file);
+    cd(null, './src/uploads/' + file.fieldname);
   },
   filename: (req,file, cd) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -33,7 +34,7 @@ export class Utils {
   }
 
   public MAX_TOKEN_TIME = 5 * 60 * 1000;
-  public multer = Multer ({storage: desinationOptions, fileFilter: fileFilter});
+  public multer = Multer ({storage: storageOptions, fileFilter: fileFilter});
 
 
   static generateVerificationToken(digit: number = 6) {
