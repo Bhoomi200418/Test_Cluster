@@ -10,17 +10,21 @@
         "es2015",
         "es2017",
         "dom"
-      ]
+      ],
+      "baseUrl": "./",
+      "paths": {
+        "*": ["src/*"]
+      }
     },
     "files": [
       "./node_modules/@types/node/index.d.ts"
     ],
     "include": [
       "src/**/*.ts",
-      "package.json"
+      "package.json",
+      "src/**/*"
     ],
     "exclude": [
       "node_modules"
     ]
   }
-  

@@ -1,6 +1,5 @@
 import { body, query } from "express-validator";
 import User from "../models/User";
-import { nextTick } from "process";
 
 
 export class UserValidators {
@@ -42,7 +41,9 @@ export class UserValidators {
   }
   static login() {
     return [
-      query("email", "Email is required")
+      body(
+        "email", "Email is required"
+      )
         .isEmail()
         .custom((email, { req }) => {
           return User.findOne({
@@ -62,7 +63,7 @@ export class UserValidators {
               throw new Error(e);
             })
         }),
-      query("password", "Password is required")
+      body("password", "Password is required")
         .isAlphanumeric()
     ];
   }
@@ -116,9 +117,6 @@ export class UserValidators {
     ];
 
   }
-
-
-
 
 
   static resetPassword() {

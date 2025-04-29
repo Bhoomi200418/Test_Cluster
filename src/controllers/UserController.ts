@@ -27,13 +27,13 @@ export class UserController {
         status,
       };
       let user = await new User(data).save();
-      // send email to user for verification
+
       const payload = {
         aud: user._id,
         email: user.email,
-        type: user.type
+        type: user.type,
       };
-      const token = Jwt.jwtSign(payload);
+      const token = Jwt.jwtSign(payload, user._id);
       res.json({
         token: token,
         user: user,
@@ -47,7 +47,7 @@ export class UserController {
       next(e);
     }
   }
-  
+
   static async verifyUserEmailToken(req, res, next) {
     const verification_token = req.body.email;
     const email = req.body.email;
@@ -108,7 +108,7 @@ export class UserController {
 
   static async login(req, res, next) {
     const user = req.user;
-    const password = req.query.password;
+    const password = req.body.password;
     const data = {
       password,
       encrypt_password: user.password,
@@ -118,9 +118,9 @@ export class UserController {
       const payload = {
         aud: user._id,
         email: user.email,
-        type: user.type
+        type: user.type,
       };
-      const token = Jwt.jwtSign(payload);
+      const token = Jwt.jwtSign(payload, user._id);
       res.json({
         token: token,
         user: user,
@@ -246,14 +246,16 @@ export class UserController {
       const payload = {
         aud: user.aud,
         email: updatedUser.email,
-        type: updatedUser.type
+        type: updatedUser.type,
       };
-      const token = Jwt.jwtSign(payload);
+      const access_token = Jwt.jwtSign(payload, user.aud);
+      const refresh_token = Jwt.jwtSign(payload, user.aud);
       res.json({
-        token: token,
+        token: access_token,
+        refreshToken: refresh_token,
         user: updatedUser,
       });
-      // send email to user for updated email verification
+
       await NodeMailer.sendMail({
         to: [updatedUser.email],
         subject: "Email Verification",

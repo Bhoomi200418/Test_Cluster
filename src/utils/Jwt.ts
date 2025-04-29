@@ -4,11 +4,11 @@ import { getEnvironmentVariable } from "../environments/environment";
 
 export class Jwt {
 
-  static jwtSign(payload, expires_in: string = '180d') {
+  static jwtSign(payload,userId ,expires_in: string = '180d') {
     return jwt.sign(
       payload,
       getEnvironmentVariable().jwt_secret_key,
-      { expiresIn: expires_in, issuer: 'technyks.com' }
+      { expiresIn: expires_in, audience: userId,issuer: 'technyks.com' }
     );
   }
   static jwtVerify(token: string): Promise<any> {

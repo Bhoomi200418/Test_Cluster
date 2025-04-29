@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-export class BannerValidators {
+export class CateoryValidators {
 
     static addBanner() {
         return [

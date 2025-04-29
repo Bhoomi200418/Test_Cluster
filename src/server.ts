@@ -8,6 +8,14 @@ import { Utils } from "./utils/Utils";
 import BannerRouter from "./routers/BannerRouter";
 import CityRouter from "./routers/CityRouter";
 import RestaurantRouter from "./routers/RestaurantRouter";
+import CategoryRouter from "./routers/CategoryRouter";
+import ItemRouter from "./routers/ItemRouter";
+import OrderRouter from "./routers/OrderRouter";
+import * as dotenv from "dotenv"
+import AddressRouter from "./routers/AddressRouter";
+
+Utils.dotenvConfigs();
+
 export class Server {
   public app: express.Application = express();
   constructor() {
@@ -21,9 +29,14 @@ export class Server {
     Utils.dotenvConfigs();
   }
   setConfigs() {
+    this.dotenvConfigs()
     this.connectMongoDB();
     this.allowCors();
     this.configureBodyParser();
+  }
+  dotenvConfis(){
+
+    dotenv.config({ path: __dirname + '/.env'})
   }
   connectMongoDB() {
     mongoose.connect(getEnvironmentVariable().db_uri).then(() => {
@@ -31,6 +44,7 @@ export class Server {
     });
   }
   configureBodyParser() {
+    this.app.use(express.json());
     this.app.use(
       bodyParser.urlencoded({
         extended: true,
@@ -46,6 +60,10 @@ export class Server {
     this.app.use("/api/banner", BannerRouter);
     this.app.use("/api/city", CityRouter);
     this.app.use("/api/restaurant", RestaurantRouter);
+    this.app.use("/api/category", CategoryRouter);
+    this.app.use("/api/item", ItemRouter);
+    this.app.use("/api/address", AddressRouter);
+    this.app.use("/api/order", OrderRouter);
   }
   error404Handler() {
     this.app.use((req, res) => {
